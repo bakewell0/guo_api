@@ -19,5 +19,6 @@ from guo_api import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('test_api/', views.test_api, name='test_api')
+    path('test_api/', views.test_api, name='test_api'),
+    path('user/', views.user, name='user')
 ]
