@@ -14,3 +14,7 @@ uwsgi uwsgiconfig.ini
 uwsgi --http :9090 --wsgi-file server.py
 ps aux | grep uwsgi
 killall -9 uwsgi
+
+echo_supervisord_conf > /etc/supervisord.conf
+supervisord -c /etc/supervisord.conf
+ps aux | grep supervisord
