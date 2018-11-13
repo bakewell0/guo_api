@@ -1,7 +1,10 @@
 from flask import Flask, jsonify,request
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
-from urllib import parse
+import urllib
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
@@ -88,12 +91,11 @@ def productDetail():
 
 @app.route('/productList')
 def productList():
-    if parse.unquote(request.values.get("productname"))=="undefined":
+    if urllib.unquote(request.values.get("productname"))=="undefined":
         productname = ""
     else:
-        productname = parse.unquote(request.values.get("productname")) or ""
+        productname = urllib.unquote(request.values.get("productname")) or ""
     return enum(product.query.filter(product.product_name.like('%'+str(productname)+'%')))
-
 
 # if __name__ == '__main__':
 #     app.run()
