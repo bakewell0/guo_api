@@ -61,6 +61,30 @@ class product(db.Model):
         return json_product
 
 
+class news(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    photo = db.Column(db.String(255))
+    news_name = db.Column(db.String(255))
+    news_content = db.Column(db.Text)
+    author = db.Column(db.String(255))
+    publish = db.Column(db.String(255))
+    origin = db.Column(db.String(255))
+    abstract = db.Column(db.String(255))
+
+    def to_json(self):
+        json_news = {
+            'id': self.id,
+            'photo': self.photo,
+            'news_name': self.news_name,
+            'news_content': self.news_content,
+            'author': self.author,
+            'publish': self.publish,
+            'origin':self.origin,
+            "abstract":self.abstract
+        }
+        return json_news
+
+
 def enum(hotList):
     result = []
     for hot in hotList:
@@ -96,6 +120,18 @@ def productList():
     else:
         productname = urllib.unquote(request.values.get("productname")) or ""
     return enum(product.query.filter(product.product_name.like('%'+str(productname)+'%')))
+
+
+@app.route('/newsList')
+def newsList():
+    return enum(news.query.order_by(-news.id).all())
+
+
+@app.route('/newsDetail')
+def newsDetail():
+    newsid = request.values.get("newsid")
+    return enum(news.query.filter_by(id=newsid))
+
 
 # if __name__ == '__main__':
 #     app.run()
