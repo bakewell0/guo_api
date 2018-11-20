@@ -170,6 +170,13 @@ def addProduct():
     db.session.commit()
     return jsonify({"isSuccess": True})
 
+@app.route('/delProduct', methods=['POST'])
+def delProduct():
+    productid = request.json["productid"]
+    p = product.query.filter_by(id=productid).first()
+    db.session.delete(p)
+    db.session.commit()
+    return jsonify({"isSuccess": True})
 
 @app.route('/productList')
 def productList():
@@ -205,6 +212,13 @@ def addNews():
     db.session.commit()
     return jsonify({"isSuccess": True})
 
+@app.route('/delNews', methods=['POST'])
+def delNews():
+    newsid = request.json["newsid"]
+    n = news.query.filter_by(id=newsid).first()
+    db.session.delete(n)
+    db.session.commit()
+    return jsonify({"isSuccess": True})
 
 if __name__ == '__main__':
     app.run()
