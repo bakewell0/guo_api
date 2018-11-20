@@ -1,15 +1,17 @@
-from flask import Flask, jsonify,request
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 import urllib
 import sys
+
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:Zjb1234.@47.99.44.43:3306/guo'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:Zjb1234.@47.99.44.43:3306/guo'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:123aaa@127.0.0.1:3306/guo'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 db = SQLAlchemy(app)
@@ -36,6 +38,26 @@ class product(db.Model):
     scan = db.Column(db.String(255))
     create_time = db.Column(db.DateTime, nullable=False)
 
+    def __init__(self, photo, product_name, product_desc, old_price, price, volume, warehouse, catalog, origin, sales,
+                 spec, weight, pack, period, storage, activity, scan):
+        self.photo = photo
+        self.product_name = product_name
+        self.product_desc = product_desc
+        self.old_price = old_price
+        self.price = price
+        self.volume = volume
+        self.warehouse = warehouse
+        self.catalog = catalog
+        self.origin = origin
+        self.sales = sales
+        self.spec = spec
+        self.weight = weight
+        self.pack = pack
+        self.period = period
+        self.storage = storage
+        self.activity = activity
+        self.scan = scan
+
     def to_json(self):
         json_product = {
             'id': self.id,
@@ -49,14 +71,14 @@ class product(db.Model):
             "catalog": self.catalog,
             "origin": self.origin,
             "sales": self.sales,
-            "spec":self.spec,
-            "weight":self.spec,
-            "pack":self.pack,
-            "period":self.period,
-            "storage":self.storage,
-            "activity":self.activity,
-            "scan":self.scan,
-            "create_time":self.create_time
+            "spec": self.spec,
+            "weight": self.spec,
+            "pack": self.pack,
+            "period": self.period,
+            "storage": self.storage,
+            "activity": self.activity,
+            "scan": self.scan,
+            "create_time": self.create_time
         }
         return json_product
 
@@ -71,6 +93,15 @@ class news(db.Model):
     origin = db.Column(db.String(255))
     abstract = db.Column(db.String(255))
 
+    def __init__(self, photo, news_name, news_content, author, publish, origin, abstract):
+        self.photo = photo
+        self.news_name = news_name
+        self.news_content = news_content
+        self.author = author
+        self.publish = publish
+        self.origin = origin
+        self.abstract = abstract
+
     def to_json(self):
         json_news = {
             'id': self.id,
@@ -79,8 +110,8 @@ class news(db.Model):
             'news_content': self.news_content,
             'author': self.author,
             'publish': self.publish,
-            'origin':self.origin,
-            "abstract":self.abstract
+            'origin': self.origin,
+            "abstract": self.abstract
         }
         return json_news
 
@@ -113,13 +144,40 @@ def productDetail():
     return enum(product.query.filter_by(id=productid))
 
 
+@app.route('/addProduct', methods=['POST'])
+def addProduct():
+    photo = request.json["photo"]
+    product_name = request.json["product_name"]
+    product_desc = request.json["product_desc"]
+    old_price = request.json["old_price"]
+    price = request.json["price"]
+    volume = request.json["volume"]
+    warehouse = request.json["warehouse"]
+    catalog = request.json["catalog"]
+    origin = request.json["origin"]
+    sales = request.json["sales"]
+    spec = request.json["spec"]
+    weight = request.json["weight"]
+    pack = request.json["pack"]
+    period = request.json["period"]
+    storage = request.json["storage"]
+    activity = request.json["activity"]
+    scan = request.json["scan"]
+
+    db.session.add(
+        product(photo, product_name, product_desc, old_price, price, volume, warehouse, catalog, origin, sales, spec,
+                weight, pack, period, storage, activity, scan))
+    db.session.commit()
+    return jsonify({"isSuccess": True})
+
+
 @app.route('/productList')
 def productList():
-    if urllib.unquote(request.values.get("productname"))=="undefined":
+    if urllib.unquote(request.values.get("productname")) == "undefined":
         productname = ""
     else:
         productname = urllib.unquote(request.values.get("productname")) or ""
-    return enum(product.query.filter(product.product_name.like('%'+str(productname)+'%')))
+    return enum(product.query.filter(product.product_name.like('%' + str(productname) + '%')))
 
 
 @app.route('/newsList')
@@ -133,5 +191,20 @@ def newsDetail():
     return enum(news.query.filter_by(id=newsid))
 
 
-# if __name__ == '__main__':
-#     app.run()
+@app.route('/addNews', methods=['POST'])
+def addNews():
+    photo = request.json["photo"]
+    news_name = request.json["news_name"]
+    news_content = request.json["news_content"]
+    author = request.json["author"]
+    publish = request.json["publish"]
+    origin = request.json["origin"]
+    abstract = request.json["abstract"]
+
+    db.session.add(news(photo, news_name, news_content, author, publish, origin, abstract))
+    db.session.commit()
+    return jsonify({"isSuccess": True})
+
+
+if __name__ == '__main__':
+    app.run()
