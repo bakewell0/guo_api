@@ -124,7 +124,7 @@ def productList():
 
 @app.route('/newsList')
 def newsList():
-    return enum(news.query.order_by(-news.id).all())
+    return enum(news.query.order_by(news.id.desc()).all())
 
 
 @app.route('/newsDetail')
