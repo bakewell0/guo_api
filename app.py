@@ -3,6 +3,7 @@ from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 import urllib
 import sys
+import os
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -16,6 +17,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 db = SQLAlchemy(app)
 
+basedir = os.path.abspath(os.path.dirname(__file__))
 
 class product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -93,12 +95,12 @@ class news(db.Model):
     origin = db.Column(db.String(255))
     abstract = db.Column(db.String(255))
 
-    def __init__(self, photo, news_name, news_content, author, publish, origin, abstract):
+    def __init__(self, photo, news_name, news_content, author, origin, abstract):
         self.photo = photo
         self.news_name = news_name
         self.news_content = news_content
         self.author = author
-        self.publish = publish
+        # self.publish = publish
         self.origin = origin
         self.abstract = abstract
 
@@ -109,7 +111,7 @@ class news(db.Model):
             'news_name': self.news_name,
             'news_content': self.news_content,
             'author': self.author,
-            'publish': self.publish,
+            # 'publish': self.publish,
             'origin': self.origin,
             "abstract": self.abstract
         }
@@ -204,11 +206,10 @@ def addNews():
     news_name = request.json["news_name"]
     news_content = request.json["news_content"]
     author = request.json["author"]
-    publish = request.json["publish"]
     origin = request.json["origin"]
     abstract = request.json["abstract"]
 
-    db.session.add(news(photo, news_name, news_content, author, publish, origin, abstract))
+    db.session.add(news(photo, news_name, news_content, author, origin, abstract))
     db.session.commit()
     return jsonify({"isSuccess": True})
 
@@ -219,6 +220,15 @@ def delNews():
     db.session.delete(n)
     db.session.commit()
     return jsonify({"isSuccess": True})
+
+
+@app.route('/up_photo', methods=['POST'], strict_slashes=False)
+def api_upload():
+    img = request.files['photo']
+    file_path = os.path.join(basedir,"./upload",img.filename)
+    img.save(file_path)
+    return jsonify({"isSuccess": True})
+
 
 if __name__ == '__main__':
     app.run()
